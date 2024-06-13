@@ -219,7 +219,7 @@ elif page == "Data Card":
     | `sex`          | Student's sex. binary: Male `M` is encoded as `0` and  Female `F` is encoded as `1`                                                                                   |
     | `age`          | Student's age. `numeric`: from 15 to 22                                                                                                                               |
     | `address`      | Student's home address type. binary: Rural `R` is encoded as `0` and Urban `U` is encoded as `1`                                                                      |
-    | `famsize`      | Family size. binary: Less than or equal to 3 `LE3` is encoded as `0` and Greater than 3 `GT3` is encoded as `1`                                                       |
+    | `famsize`      | Family size total. binary: Less than or equal to 3 `LE3` is encoded as `0` and Greater than 3 `GT3` is encoded as `1`                                                       |
     | `Pstatus`      | Parent's cohabitation status. binary: 'Apart `A` is encoded as `0` and Together `T` is encoded as `1`                                                                 |
     | `Medu`         | Mother's education. `numeric`: 0 - none to 4 - higher education                                                                                                       |
     | `Fedu`         | Father's education. `numeric`: 0 - none to 4 - higher education                                                                                                       |
@@ -228,25 +228,26 @@ elif page == "Data Card":
     | `reason`       | Reason to choose this school. nominal: `course` is encoded as `0`, `other` is encoded as `1`, `home` is encoded as `2`,  `reputation` is encoded as `3`               |
     | `guardian`     | Student's guardian. nominal: `mother` is encoded as `0`, `father` is encoded as `1`, `other` is encoded as `2`                                                        |
     | `traveltime`   | Home to school travel time. numeric: `no` is encoded as `0`, `yes` is encoded as `1`                                                                                  |
-    | `studytime`    | Weekly study time `numeric`: 1 - <2 hours to 4 - >10 hours                                                                                                            |
+    | `studytime`    | Weekly personal study time `numeric`: 1 - <2 hours to 4 - >10 hours                                                                                                            |
     | `failures`     | Number of past class failures `numeric`: n if 1<=n<3, else 4                                                                                                          |
-    | `schoolsup`    | Extra educational support. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                     |
+    | `schoolsup`    | Extra educational support such as courses or extra lessons. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                     |
     | `famsup`       | Family educational support. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                    |
     | `paid`         | Extra paid classes. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                            |
     | `activities`   | Extra-curricular activities. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                   |
-    | `nursery`      | Attended nursery school. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                       |
+    | `nursery`      | Attended nursery school such as Kindergaten School. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                       |
     | `higher`       | Wants to take higher education. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                |
     | `internet`     | Internet access at home. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                       |
     | `romantic`     | With a romantic relationship. binary:`no` is encoded as `0`, `yes` is encoded as `1`                                                                                  |
     | `famrel`       | Quality of family relationships. `numeric`: 1 - very bad to 5 - excellent                                                                                             |
     | `goout`        | Going out with friends. `numeric`: 1 - very low to 5 - very high                                                                                                      |
-    | `Dalc`         | Workday alcohol consumption. `numeric`: 1 - very low to 5 - very high                                                                                                 |
+    | `Dalc`         | Weekday alcohol consumption. `numeric`: 1 - very low to 5 - very high                                                                                                 |
     | `Walc`         | Weekend alcohol consumption. `numeric`: 1 - very low to 5 - very high                                                                                                 |
     | `health`       | Current health status. `numeric`: 1 - very bad to 5 - very good                                                                                                       |
-    | `absences`     | Number of school absences. `numeric`: from 0 to 93                                                                                                                    |
+    | `absences`     | Number of school absences. `numeric`: from 0 to 33                                                                                                                    |
     | `G1`           | First period grade. `numeric`: from 0 to 20                                                                                                                           |
     | `G2`           | Second period grade. `numeric`: from 0 to 20                                                                                                                          |
-    | `G3`           | Final grade. `numeric`: from 0 to 20, output target                                                                                                                   |           
+    | `G3`           | Final grade as `avg` from G1 and G2. `numeric`: from 0 to 20, output target                                                                                                                   |           
+                                                                                                                                 |           
                 
 
                 
