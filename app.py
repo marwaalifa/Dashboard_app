@@ -18,11 +18,13 @@ from itertools import cycle
 # read datasets
 df = pd.read_csv("stud.csv")
 
+# Encode categorical features
 label_encoders = {}
 for column in df.select_dtypes(include=['object']).columns:
     label_encoders[column] = LabelEncoder()
     df[column] = label_encoders[column].fit_transform(df[column])
 
+# Encode grades
 def encode_grades(g3):
     if g3 >= 18:
         return 'A'  # Excellent
@@ -35,41 +37,33 @@ def encode_grades(g3):
     else:
         return 'E'  # Fail
 
-# Apply the encoding function to create the new 'grades' column
 df['grades'] = df['G3'].apply(encode_grades)
 
-# Verify the DataFrame and new column
-print("First few rows of the DataFrame with the new 'grades' column:")
-print(df.head())
-
-# Encode the 'grades' column to numerical values for machine learning
+# Encode 'grades' to numerical values
 df['grades_encoded'] = df['grades'].map({'A': 4, 'B': 3, 'C': 2, 'D': 1, 'E': 0})
 
-# Memisahkan fitur dan label
+# Separate features and labels
 X = df.drop(["grades", "G3"], axis=1)
 y = df["grades"]
 
-# Membagi data menjadi data latih dan data uji
+# Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Membuat model KNN
+# Create and train KNN model
 knn_model = KNeighborsClassifier(n_neighbors=4, metric='manhattan')
-
-# Melatih model
 knn_model.fit(X_train, y_train)
 
-# Melakukan prediksi
+# Predict on test data
 y_pred = knn_model.predict(X_test)
 
-# Menghitung akurasi dan metrik lainnya
+# Compute metrics
 accuracy = accuracy_score(y_test, y_pred)
 precision = precision_score(y_test, y_pred, average='macro')
 
-# Binarize the output
+# Binarize the output for ROC curves
 y_test_bin = label_binarize(y_test, classes=[*range(len(set(y)))])
 n_classes = y_test_bin.shape[1]
 
-# Compute ROC curve and ROC area for each class
 fpr = dict()
 tpr = dict()
 roc_auc = dict()
@@ -77,7 +71,6 @@ for i in range(n_classes):
     fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], knn_model.predict_proba(X_test)[:, i])
     roc_auc[i] = auc(fpr[i], tpr[i])
 
-# Compute micro-average ROC curve and ROC area
 fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), knn_model.predict_proba(X_test).ravel())
 roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
@@ -85,64 +78,141 @@ roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 print(f"Accuracy: {accuracy}")
 print(f"Precision: {precision}")
 
+# Metadata and encoding mappings
+feature_metadata = {
+    "school": "Student's school. GP: Gabriel Pereira, MS: Mousinho da Silveira",
+    "sex": "Student's sex. M: Male, F: Female",
+    "age": "Student's age. Enter an integer value between 15 and 22.",
+    "address": "Student's home address type. R: Rural, U: Urban",
+    "famsize": "Family size. LE3: Less than or equal to 3, GT3: Greater than 3",
+    "Pstatus": "Parent's cohabitation status. A: Apart, T: Together",
+    "Medu": "Mother's education. 0: none to 4: higher education",
+    "Fedu": "Father's education. 0: none to 4: higher education",
+    "Mjob": "Mother's job. at_home, health, other, services, teacher",
+    "Fjob": "Father's job. at_home, health, other, services, teacher",
+    "reason": "Reason to choose this school. course, other, home, reputation",
+    "guardian": "Student's guardian. mother, father, other",
+    "traveltime": "Home to school travel time. 1: <15 min, 2: 15-30 min, 3: 30-60 min, 4: >1 hour",
+    "studytime": "Weekly study time. 1: <2 hours, 2: 2-5 hours, 3: 5-10 hours, 4: >10 hours",
+    "failures": "Number of past class failures. Enter an integer value between 0 and 4.",
+    "schoolsup": "Extra educational support. no, yes",
+    "famsup": "Family educational support. no, yes",
+    "paid": "Extra paid classes. no, yes",
+    "activities": "Extra-curricular activities. no, yes",
+    "nursery": "Attended nursery school. no, yes",
+    "higher": "Wants to take higher education. no, yes",
+    "internet": "Internet access at home. no, yes",
+    "romantic": "With a romantic relationship. no, yes",
+    "famrel": "Quality of family relationships. 1: very bad to 5: excellent",
+    "freetime": "Free time after school. 1: very low to 5: very high",
+    "goout": "Going out with friends. 1: very low to 5: very high",
+    "Dalc": "Workday alcohol consumption. 1: very low to 5: very high",
+    "Walc": "Weekend alcohol consumption. 1: very low to 5: very high",
+    "health": "Current health status. 1: very bad to 5: very good",
+    "absences": "Number of school absences. Enter an integer value between 0 and 33.",
+    "G1": "First period grade. Enter an integer value between 0 and 20.",
+    "G2": "Second period grade. Enter an integer value between 0 and 20."
+}
+
+encoding_mappings = {
+    "school": {"GP": 0, "MS": 1},
+    "sex": {"M": 0, "F": 1},
+    "address": {"R": 0, "U": 1},
+    "famsize": {"LE3": 0, "GT3": 1},
+    "Pstatus": {"A": 0, "T": 1},
+    "Mjob": {"at_home": 0, "health": 1, "other": 2, "services": 3, "teacher": 4},
+    "Fjob": {"at_home": 0, "health": 1, "other": 2, "services": 3, "teacher": 4},
+    "reason": {"course": 0, "other": 1, "home": 2, "reputation": 3},
+    "guardian": {"mother": 0, "father": 1, "other": 2},
+    "schoolsup": {"no": 0, "yes": 1},
+    "famsup": {"no": 0, "yes": 1},
+    "paid": {"no": 0, "yes": 1},
+    "activities": {"no": 0, "yes": 1},
+    "nursery": {"no": 0, "yes": 1},
+    "higher": {"no": 0, "yes": 1},
+    "internet": {"no": 0, "yes": 1},
+    "romantic": {"no": 0, "yes": 1},
+}
+
+def encode_inputs(user_inputs):
+    encoded_inputs = {}
+    for key, value in user_inputs.items():
+        if key in encoding_mappings:
+            encoded_inputs[key] = encoding_mappings[key][value]
+        else:
+            encoded_inputs[key] = value
+    return encoded_inputs
+
 
 # streamlit_navigation_bar
-page = st_navbar(["Home", "Data", "Feature Importance", "KNN", "Feature Dependence", "Summary"])
+page = st_navbar(["Home", "Data Card", "Feature Importance", "KNN", "Feature Dependence", "Summary"])
 
 ###################
 # DASHBOARD
 if page == "Home":
     st.title("Student Final Grades Prediction Dashboard")
     st.markdown("""
-    Welcome to the Student Grades Prediction Dashboard. This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on various input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the `Data` Page.
-                
+    Welcome to the Student Grades Prediction Dashboard. This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on various input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process below.
 
     ### Why Numeric Values?
-    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
+    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
 
+    ## Predict Students' Final Grades using KNN Classification
+    ### Generate Final Score
+    Input the required values for each feature and click the 'Generate Grades' button to predict the grades score.
     """)
 
     st.markdown("""
-                
+    #### Instructions:
+    - For numerical inputs, use the provided range sliders or input boxes.
+    - For categorical inputs, select from the provided options.
+    - Click 'Generate Grades' to see the prediction.
 
-                ## Predict students final grades using KNN Classification
-                #### Generate Final Score
-                Input values of labels and click button 'Generate Grades' To predict the Grades score
-                """)
+    The feature descriptions and their encoded values are as follows:
+    """)
 
-    # Membuat form input untuk fitur
-    with st.form("input_form"):
-        inputs = {}
-        for column in X.columns:
-            # Anda dapat menyesuaikan tipe input berdasarkan tipe data setiap fitur
-            if df[column].dtype == 'int64':
-                inputs[column] = st.number_input(f"{column}", min_value=int(df[column].min()), max_value=int(df[column].max()), value=int(df[column].mean()))
-            elif df[column].dtype == 'float64':
-                inputs[column] = st.number_input(f"{column}", min_value=float(df[column].min()), max_value=float(df[column].max()), value=float(df[column].mean()))
+    # Collect user inputs
+    user_inputs = {}
+    for feature, description in feature_metadata.items():
+        if feature in encoding_mappings:
+            options = list(encoding_mappings[feature].keys())
+            user_inputs[feature] = st.selectbox(f"**{feature}** {description} ", options)
+        else:
+            numeric_limits = [int(s) for s in description.split() if s.isdigit()]
+            #if len(numeric_limits) == 2:
+            #
+            #    user_inputs[feature] = st.number_input(f"{description} ({feature})", min_value=min_val, max_value=max_val, step=1)
+            #else:
+            #\   user_inputs[feature] = st.number_input(f"{description} ({feature})", step=1)
+    #for column in X.columns:
+            if df[feature].dtype == 'int64':
+                user_inputs[feature] = st.number_input(f"**{feature}** {description} ", min_value=int(df[feature].min()), max_value=int(df[feature].max()), value=int(df[feature].mean()))
+            elif df[feature].dtype == 'float64':
+                user_inputs[feature] = st.number_input(f"**{feature}** {description}", min_value=float(df[feature].min()), max_value=float(df[feature].max()), value=float(df[feature].mean()))
             else:
-                unique_values = df[column].unique()
-                inputs[column] = st.selectbox(f"{column}", options=unique_values, index=0)
-            
-        submitted = st.form_submit_button("Generate Grades")
-        st.spinner()
-        if submitted:
-        # Konversi input pengguna ke DataFrame
-            input_df = pd.DataFrame([inputs])
+                unique_values = df[feature].unique()
+                user_inputs[feature] = st.selectbox(f"**{feature}** {description}", options=unique_values, index=0)
                 
-        # Pastikan urutan kolom sesuai dengan yang diharapkan oleh model
-            input_df = input_df.reindex(columns=X.columns, fill_value=0)
-                
-        # Melakukan prediksi berdasarkan input pengguna
-            prediction = knn_model.predict(input_df)
-            st.write(f"Predict Grades: {prediction[0]}")    
+
+    submit_button = st.button(label="Generate Grades")
+
+    if submit_button:
+        with st.spinner("Predicting..."):
+            # Add missing features to user inputs
+            user_inputs['grades_encoded'] = 0  # Placeholder, it will not affect prediction
+            encoded_inputs = encode_inputs(user_inputs)
+            input_df = pd.DataFrame([encoded_inputs])
+            prediction = knn_model.predict(input_df[X.columns])
+            predicted_grade = prediction[0]
+            st.success(f"The predicted grade is: {predicted_grade}")
+
+    
         
 
-elif page == "Data":
-    st.title("Model of Datasets")
+elif page == "Data Card":
+    st.title("Data Card of Features")
     st.markdown("""
     
-
-    ### Data Card of Features
     | Feature        | Description                                                                                                                                                           | 
     |----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | `school`       | Student's school. binary: Gabriel Pereira `GP` is encoded as `0` and `MS` Mousinho da Silveira `MS` is encoded as `1`                                                 |
