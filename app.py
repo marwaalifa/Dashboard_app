@@ -152,7 +152,7 @@ page = st_navbar(["Home", "Data Card", "Feature Importance", "KNN", "Feature Dep
 if page == "Home":
     st.title("Student Final Grades Prediction Dashboard")
     st.markdown("""
-    Welcome to the Student Grades Prediction Dashboard. This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on various input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process below.
+    Welcome to the Student Grades Prediction Dashboard. This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on various input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the 'Data Card' Page.
 
     ### Why Numeric Values?
     Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
