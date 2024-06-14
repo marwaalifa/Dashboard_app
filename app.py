@@ -150,25 +150,15 @@ page = st_navbar(["Home", "Data Card", "Feature Importance", "KNN", "Feature Dep
 ###################
 # DASHBOARD
 if page == "Home":
-    st.title("Student Final Grades Prediction Dashboard")
     st.markdown("""
-    Welcome to the Student Grades Prediction Dashboard. This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on various input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the `Data Card` Page.
-
-    ### Why Numeric Values?
-    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
-
-    ## Predict Students' Final Grades using KNN Classification
-    ### Generate Final Score
-    Input the required values for each feature and click the 'Generate Grades' button to predict the grades score.
-    """)
-
-    st.markdown("""
+    ## Predict Student's Final Grades using KNN Classification            
+    Input the required values for each feature and click the 'Generate Grades' button to predict the grades score.            
     #### Instructions:
     - For numerical inputs, use the provided range sliders or input boxes.
     - For categorical inputs, select from the provided options.
     - Click 'Generate Grades' to see the prediction.
 
-    The feature descriptions and their encoded values are as follows:
+    You can find feature descriptions and their encoded values on the `Data Card` Page.
     """)
 
     # Collect user inputs
@@ -247,7 +237,6 @@ elif page == "Data Card":
     | `G1`           | First period grade. `numeric`: from 0 to 20                                                                                                                           |
     | `G2`           | Second period grade. `numeric`: from 0 to 20                                                                                                                          |
     | `G3`           | Final grade as `avg` from G1 and G2. `numeric`: from 0 to 20, output target                                                                                                                   |           
-                                                                                                                                 |           
                 
 
                 
@@ -449,7 +438,6 @@ elif page == "Feature Dependence":
    # st.write(correlation_df.sort_values(ascending=False))
 
 elif page == "Summary":
-    st.title("Summary of KNN Classification")
     
     # Menampilkan ringkasan hasil pelatihan model
     st.subheader("Training Summary")
@@ -478,9 +466,12 @@ elif page == "Summary":
     
     st.markdown("""
     ### SUMMARY
-     These application aims to predict student final grades and analyze related factors using the Student data from UC Irvine Repository. The data consists of 33 attributes and 5 grading classes. We utilized 10 machine learning methods, including Naive Bayes, Neural Network MLP, Logistic Regression, Gradient Boosting, Gaussian Process, Linear Discriminant Analysis, SVM, XGBoost, Random Forest, and KNN. and The KNN model achieved the highest accuracy of 82%, outperforming other models. This work enhances previous research by improving classification accuracy using classic machine learning algorithms.          
-               
-   Using this Dashboard you can explore how different features affect student grades and make predictions based on the provided input values. 
+    This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on 33 input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the `Data Card` Page.  We utilized 10 machine learning methods and The`KNN Model`achieved the highest accuracy of 82%, outperforming other models. This work enhances previous research by improving classification accuracy using classic machine learning algorithms.
+    ### Why Numeric Values?
+    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
+
+
+    Using this Dashboard you can explore how different features affect student grades and make predictions based on the provided input values. 
     """)
 
 
