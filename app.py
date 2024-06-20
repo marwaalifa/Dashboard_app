@@ -15,6 +15,7 @@ from sklearn.inspection import permutation_importance
 from streamlit_navigation_bar import st_navbar
 from itertools import cycle
 
+
 # read datasets
 df = pd.read_csv("stud.csv")
 
@@ -150,7 +151,9 @@ page = st_navbar(["Home", "Data Card", "Feature Importance", "KNN", "Feature Dep
 ###################
 # DASHBOARD
 if page == "Home":
+    st.set_page_config
     st.markdown("""
+    
     ## Predict Student's Final Grades using KNN Classification            
     Input the required values for each feature and click the 'Generate Grades' button to predict the grades score.            
     #### Instructions:
