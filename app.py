@@ -15,6 +15,12 @@ from sklearn.inspection import permutation_importance
 from streamlit_navigation_bar import st_navbar
 from itertools import cycle
 
+# Set page configuration
+st.set_page_config(
+    page_title="Student Predict Final Grades",
+    layout="wide",
+    initial_sidebar_state="auto"
+)
 
 # read datasets
 df = pd.read_csv("stud.csv")
@@ -146,15 +152,28 @@ def encode_inputs(user_inputs):
 
 
 # streamlit_navigation_bar
-page = st_navbar(["Home", "Data Card", "Feature Importance", "KNN", "Feature Dependence", "Summary"])
+from streamlit_option_menu import option_menu
+
+with st.sidebar:
+    selected=option_menu(
+        menu_title="Student Predict Menu",
+        options= ["Predict", "Explore", "Summary"],
+        default_index=0,
+    )
+
+model_accuracies = {
+    "KNN": "82.31%",
+    "XGBoost": "80.77%",
+    "Random Forest": "80.00%",
+    "SVM": "80.00%",
+    "LDA": "80.00%"
+}
 
 ###################
 # DASHBOARD
-if page == "Home":
-    st.set_page_config
-    st.markdown("""
-    
-    ## Predict Student's Final Grades using KNN Classification            
+if selected == "Predict":
+    st.title("Predict Student's Final Grades")
+    st.markdown("""        
     Input the required values for each feature and click the 'Generate Grades' button to predict the grades score.            
     #### Instructions:
     - For numerical inputs, use the provided range sliders or input boxes.
@@ -164,30 +183,43 @@ if page == "Home":
     You can find feature descriptions and their encoded values on the `Data Card` Page.
     """)
 
+    chosen_model = st.selectbox("Choose a classification model", list(model_accuracies.keys()))
+    st.write(f"You have selected {chosen_model} with an accuracy of {model_accuracies[chosen_model]}")
+
     # Collect user inputs
     user_inputs = {}
-    for feature, description in feature_metadata.items():
-        if feature in encoding_mappings:
-            options = list(encoding_mappings[feature].keys())
-            user_inputs[feature] = st.selectbox(f"**{feature}** {description} ", options)
-        else:
-            numeric_limits = [int(s) for s in description.split() if s.isdigit()]
-            #if len(numeric_limits) == 2:
-            #
-            #    user_inputs[feature] = st.number_input(f"{description} ({feature})", min_value=min_val, max_value=max_val, step=1)
-            #else:
-            #\   user_inputs[feature] = st.number_input(f"{description} ({feature})", step=1)
-    #for column in X.columns:
-            if df[feature].dtype == 'int64':
-                user_inputs[feature] = st.number_input(f"**{feature}** {description} ", min_value=int(df[feature].min()), max_value=int(df[feature].max()), value=int(df[feature].mean()))
-            elif df[feature].dtype == 'float64':
-                user_inputs[feature] = st.number_input(f"**{feature}** {description}", min_value=float(df[feature].min()), max_value=float(df[feature].max()), value=float(df[feature].mean()))
-            else:
-                unique_values = df[feature].unique()
-                user_inputs[feature] = st.selectbox(f"**{feature}** {description}", options=unique_values, index=0)
-                
+    col1, col2 = st.columns(2)
+    with col1:
+        for i, (feature, description) in enumerate(feature_metadata.items()):
+            if i % 2 == 0:
+                if feature in encoding_mappings:
+                    options = list(encoding_mappings[feature].keys())
+                    user_inputs[feature] = st.selectbox(f"**{feature}** {description} ", options)
+                else:
+                    if df[feature].dtype == 'int64':
+                        user_inputs[feature] = st.number_input(f"**{feature}** {description} ", min_value=int(df[feature].min()), max_value=int(df[feature].max()), value=int(df[feature].mean()))
+                    elif df[feature].dtype == 'float64':
+                        user_inputs[feature] = st.number_input(f"**{feature}** {description}", min_value=float(df[feature].min()), max_value=float(df[feature].max()), value=float(df[feature].mean()))
+                    else:
+                        unique_values = df[feature].unique()
+                        user_inputs[feature] = st.selectbox(f"**{feature}** {description}", options=unique_values, index=0)
+    with col2:
+        for i, (feature, description) in enumerate(feature_metadata.items()):
+            if i % 2 != 0:
+                if feature in encoding_mappings:
+                    options = list(encoding_mappings[feature].keys())
+                    user_inputs[feature] = st.selectbox(f"**{feature}** {description} ", options)
+                else:
+                    if df[feature].dtype == 'int64':
+                        user_inputs[feature] = st.number_input(f"**{feature}** {description} ", min_value=int(df[feature].min()), max_value=int(df[feature].max()), value=int(df[feature].mean()))
+                    elif df[feature].dtype == 'float64':
+                        user_inputs[feature] = st.number_input(f"**{feature}** {description}", min_value=float(df[feature].min()), max_value=float(df[feature].max()), value=float(df[feature].mean()))
+                    else:
+                        unique_values = df[feature].unique()
+                        user_inputs[feature] = st.selectbox(f"**{feature}** {description}", options=unique_values, index=0)
 
     submit_button = st.button(label="Generate Grades")
+
 
     if submit_button:
         with st.spinner("Predicting..."):
@@ -198,14 +230,14 @@ if page == "Home":
             prediction = knn_model.predict(input_df[X.columns])
             predicted_grade = prediction[0]
             st.success(f"The predicted grade is: {predicted_grade}")
-
-    
+            #st.write(f"Model Accuracy: {chosen_model} | {model_accuracies[chosen_model]}")   
         
 
-elif page == "Data Card":
-    st.title("Data Card of Features")
+elif selected == "Explore":
+    st.title("Explore Page")
     st.markdown("""
-    
+    ##Data Card of Features"
+                
     | Feature        | Description                                                                                                                                                           | 
     |----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | `school`       | Student's school. binary: Gabriel Pereira `GP` is encoded as `0` and `MS` Mousinho da Silveira `MS` is encoded as `1`                                                 |
@@ -241,8 +273,6 @@ elif page == "Data Card":
     | `G2`           | Second period grade. `numeric`: from 0 to 20                                                                                                                          |
     | `G3`           | Final grade as `avg` from G1 and G2. `numeric`: from 0 to 20, output target                                                                                                                   |           
                 
-
-                
     ### Grade Encoding
     Using these Grade table based on The fundamentals of the Portuguese educational system are utilized to define the academic grade classes in the dataset            
     
@@ -256,10 +286,7 @@ elif page == "Data Card":
 
 
     """)
-
-
-
-elif page == "Feature Importance":
+    st.title("Feature Importance")  
     
     # Menghitung feature importance menggunakan permutation importance
     importance = permutation_importance(knn_model, X_test, y_test, n_repeats=10, random_state=42)
@@ -295,7 +322,6 @@ elif page == "Feature Importance":
         st.write("Feature Description:")
         st.dataframe(feature_description)
 
-elif page == "KNN":
     st.title("Classification KNN Performance")
     
     # Menghitung prediksi dan probabilitas prediksi
@@ -389,8 +415,6 @@ elif page == "KNN":
         ax.set_xticklabels(['Class {}'.format(i) for i in range(len(roc_auc))])
         st.pyplot(fig)
             
-
-elif page == "Feature Dependence":
     st.title("Feature Dependence")
 
     # Filter only numeric columns for correlation
@@ -440,17 +464,22 @@ elif page == "Feature Dependence":
    #correlation_df = correlation_filtered.reset_index()
    # st.write(correlation_df.sort_values(ascending=False))
 
-elif page == "Summary":
+elif selected == "Summary":
+    st.markdown("""
+    ### SUMMARY
+    This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on 33 input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the `Data Card` Page.  We utilized 10 machine learning methods and The`KNN Model`achieved the highest accuracy of 82%, outperforming other models. This work enhances previous research by improving classification accuracy using classic machine learning algorithms.
+    ### Why Numeric Values?
+    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
+
+
+    Using this Dashboard you can explore how different features affect student grades and make predictions based on the provided input values. 
+    """)
     
-    # Menampilkan ringkasan hasil pelatihan model
-    st.subheader("Training Summary")
-    train_summary_data = {
-        "Number of samples in training set": [len(X_train)],
-        "Number of features": [X_train.shape[1]],
-        "Number of classes": [len(np.unique(y_train))]
-    }
-    st.table(pd.DataFrame(train_summary_data))
-    
+    # Menampilkan classification report
+    st.subheader("Classification Report")
+    classification_report_df = pd.DataFrame.from_dict(classification_report(y_test, y_pred, output_dict=True)).T
+    st.table(classification_report_df)
+
     # Menampilkan metrik evaluasi model
     st.subheader("Performance Metrics")
     metrics_data = {
@@ -461,24 +490,19 @@ elif page == "Summary":
     for i in range(n_classes):
         metrics_data[f"ROC AUC (Class {i})"] = [f"{roc_auc[i]:.2f}"]
     st.table(pd.DataFrame(metrics_data))
-    
-    # Menampilkan confusion matrix
+
+     # Menampilkan confusion matrix
     st.subheader("Confusion Matrix")
     cm = confusion_matrix(y_test, y_pred)
     st.table(pd.DataFrame(cm, index=np.unique(y_test), columns=np.unique(y_test)))
+
+    # Menampilkan ringkasan hasil pelatihan model
+    st.subheader("Training Summary")
+    train_summary_data = {
+        "Number of samples in training set": [len(X_train)],
+        "Number of features": [X_train.shape[1]],
+        "Number of classes": [len(np.unique(y_train))]
+    }
+    st.table(pd.DataFrame(train_summary_data))
     
-    st.markdown("""
-    ### SUMMARY
-    This dashboard utilizes a K-Nearest Neighbors (KNN) classification model to predict student grades based on 33 input features. Many of these features were initially categorical (non-numeric) and have been converted to numeric values to be compatible with the model. You can find a detailed description of the feature encoding process on the `Data Card` Page.  We utilized 10 machine learning methods and The`KNN Model`achieved the highest accuracy of 82%, outperforming other models. This work enhances previous research by improving classification accuracy using classic machine learning algorithms.
-    ### Why Numeric Values?
-    Machine learning models require numerical input to perform calculations and make predictions. Thus, the categorical features in the [dataset](https://archive.ics.uci.edu/ml/datasets/student+performance) are converted into numeric values. This encoding process allows the model to understand and interpret the input data effectively.
-
-
-    Using this Dashboard you can explore how different features affect student grades and make predictions based on the provided input values. 
-    """)
-
-
-    # Menampilkan classification report
-    st.subheader("Classification Report")
-    classification_report_df = pd.DataFrame.from_dict(classification_report(y_test, y_pred, output_dict=True)).T
-    st.table(classification_report_df)
+   
