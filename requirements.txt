@@ -5,3 +5,4 @@ scikit-learn
 matplotlib
 streamlit
 streamlit-navigation-bar
+streamlit_option_menu
